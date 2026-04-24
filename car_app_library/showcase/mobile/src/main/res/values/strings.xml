@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mobile_subtitle">Phone demo for online preview and emulator-friendly showcasing.</string>
+    <string name="mobile_active_scenario">ACTIVE SCENARIO</string>
+    <string name="mobile_media_format">Title: %1$s\nSource: %2$s\nState: %3$s\nVolume: Level %4$d\n\n%5$s</string>
+    <string name="mobile_reconnect_format">Status: %1$s\nSummary: %2$s\nNext Action: %3$s\n\n%4$s</string>
+</resources>
