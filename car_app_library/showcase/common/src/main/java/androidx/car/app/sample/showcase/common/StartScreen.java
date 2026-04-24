@@ -18,113 +18,78 @@ package androidx.car.app.sample.showcase.common;
 import androidx.annotation.NonNull;
 import androidx.car.app.CarContext;
 import androidx.car.app.Screen;
-import androidx.car.app.constraints.ConstraintManager;
 import androidx.car.app.model.Action;
-import androidx.car.app.model.CarIcon;
+import androidx.car.app.model.ActionStrip;
 import androidx.car.app.model.ItemList;
 import androidx.car.app.model.ListTemplate;
 import androidx.car.app.model.Row;
 import androidx.car.app.model.Template;
-import androidx.car.app.sample.showcase.common.misc.MiscDemoScreen;
-import androidx.car.app.sample.showcase.common.navigation.NavigationDemosScreen;
-import androidx.car.app.sample.showcase.common.templates.MiscTemplateDemosScreen;
-import androidx.car.app.sample.showcase.common.textandicons.TextAndIconsDemosScreen;
-import androidx.car.app.versioning.CarAppApiLevels;
-import androidx.core.graphics.drawable.IconCompat;
+import androidx.car.app.sample.showcase.common.connectivity.ConnectionDashboardScreen;
+import androidx.car.app.sample.showcase.common.connectivity.ConnectivityRepository;
+import androidx.car.app.sample.showcase.common.connectivity.EventLogScreen;
+import androidx.car.app.sample.showcase.common.connectivity.MediaCenterScreen;
+import androidx.car.app.sample.showcase.common.connectivity.ReconnectFlowScreen;
 
 /** The starting screen of the app. */
 public final class StartScreen extends Screen {
-    @NonNull
-    private final ShowcaseSession mShowcaseSession;
-
     public StartScreen(@NonNull CarContext carContext, @NonNull ShowcaseSession showcaseSession) {
         super(carContext);
-        mShowcaseSession = showcaseSession;
     }
 
     @NonNull
     @Override
     public Template onGetTemplate() {
+        ConnectivityRepository.Scenario scenario = ConnectivityRepository.currentScenario();
         ItemList.Builder listBuilder = new ItemList.Builder();
-        listBuilder.addItem(
-                new Row.Builder()
-                        .setTitle(getCarContext().getString(R.string.selectable_lists_demo_title))
-                        .setOnClickListener(
-                                () ->
-                                        getScreenManager()
-                                                .push(
-                                                        new SelectableListsDemoScreen(
-                                                                getCarContext())))
-                        .build());
-        listBuilder.addItem(
-                new Row.Builder()
-                        .setTitle(getCarContext().getString(R.string.task_restriction_demo_title))
-                        .setOnClickListener(
-                                () ->
-                                        getScreenManager()
-                                                .push(
-                                                        new TaskRestrictionDemoScreen(
-                                                                1, getCarContext())))
-                        .build());
-        listBuilder.addItem(
-                new Row.Builder()
-                        .setImage(
-                                new CarIcon.Builder(
-                                        IconCompat.createWithResource(
-                                                getCarContext(),
-                                                R.drawable.ic_map_white_48dp))
-                                        .build(),
-                                Row.IMAGE_TYPE_ICON)
-                        .setTitle(getCarContext().getString(R.string.nav_demos_title))
-                        .setOnClickListener(
-                                () -> getScreenManager()
-                                        .push(new NavigationDemosScreen(getCarContext())))
-                        .setBrowsable(true)
-                        .build());
-        int listLimit = 6;
-        // Adjust the item limit according to the car constrains.
-        if (getCarContext().getCarAppApiLevel() > CarAppApiLevels.LEVEL_1) {
-            listLimit = getCarContext().getCarService(ConstraintManager.class).getContentLimit(
-                    ConstraintManager.CONTENT_LIMIT_TYPE_LIST);
-        }
-        int miscTemplateDemoScreenItemLimit = listLimit;
-        listBuilder.addItem(
-                new Row.Builder()
-                        .setTitle(getCarContext().getString(R.string.misc_templates_demos_title))
-                        .setOnClickListener(
-                                () ->
-                                        getScreenManager()
-                                                .push(new MiscTemplateDemosScreen(
-                                                        getCarContext(),
-                                                        0,
-                                                        miscTemplateDemoScreenItemLimit)))
-                        .setBrowsable(true)
-                        .build());
-        listBuilder.addItem(
-                new Row.Builder()
-                        .setTitle(getCarContext().getString(R.string.text_icons_demo_title))
-                        .setOnClickListener(
-                                () ->
-                                        getScreenManager()
-                                                .push(new TextAndIconsDemosScreen(getCarContext())))
-                        .setBrowsable(true)
-                        .build());
-        listBuilder.addItem(
-                new Row.Builder()
-                        .setTitle(getCarContext().getString(R.string.misc_demo_title))
-                        .setOnClickListener(
-                                () ->
-                                        getScreenManager()
-                                                .push(new MiscDemoScreen(getCarContext(),
-                                                        mShowcaseSession)))
-                        .setBrowsable(true)
-                        .build());
+
+        listBuilder.addItem(new Row.Builder()
+                .setTitle(getCarContext().getString(R.string.connectivity_overview_title))
+                .addText(scenario.name)
+                .addText(scenario.summary)
+                .setBrowsable(true)
+                .setOnClickListener(() -> getScreenManager().push(
+                        new ConnectionDashboardScreen(getCarContext())))
+                .build());
+        listBuilder.addItem(new Row.Builder()
+                .setTitle(getCarContext().getString(R.string.media_center_title))
+                .addText(scenario.mediaState.playbackState + " via " + scenario.mediaState.source)
+                .addText(scenario.mediaState.title)
+                .setBrowsable(true)
+                .setOnClickListener(() -> getScreenManager().push(
+                        new MediaCenterScreen(getCarContext())))
+                .build());
+        listBuilder.addItem(new Row.Builder()
+                .setTitle(getCarContext().getString(R.string.event_log_title))
+                .addText(getCarContext().getString(
+                        R.string.event_log_summary,
+                        scenario.eventLog.size(),
+                        scenario.eventLog.get(0).eventType))
+                .setBrowsable(true)
+                .setOnClickListener(() -> getScreenManager().push(
+                        new EventLogScreen(getCarContext())))
+                .build());
+        listBuilder.addItem(new Row.Builder()
+                .setTitle(getCarContext().getString(R.string.reconnect_flow_title))
+                .addText(scenario.reconnectState.status)
+                .addText(scenario.reconnectState.summary)
+                .setBrowsable(true)
+                .setOnClickListener(() -> getScreenManager().push(
+                        new ReconnectFlowScreen(getCarContext())))
+                .build());
+
+        Action cycleScenario = new Action.Builder()
+                .setTitle(getCarContext().getString(R.string.cycle_scenario_action_title))
+                .setOnClickListener(() -> {
+                    ConnectivityRepository.advanceScenario();
+                    invalidate();
+                })
+                .build();
+
         return new ListTemplate.Builder()
                 .setSingleList(listBuilder.build())
-                .setTitle(getCarContext().getString(R.string.showcase_demos_title) + " ("
-                        + getCarContext().getString(R.string.cal_api_level_prefix,
-                        getCarContext().getCarAppApiLevel()) + ")")
+                .setTitle(getCarContext().getString(R.string.app_name))
                 .setHeaderAction(Action.APP_ICON)
+                .setActionStrip(new ActionStrip.Builder().addAction(cycleScenario).build())
                 .build();
     }
 }

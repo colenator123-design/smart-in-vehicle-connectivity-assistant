@@ -15,7 +15,22 @@
  limitations under the License.
 -->
 <resources>
-  <string name="app_name" translatable="false">Showcase</string>
+  <string name="app_name" translatable="false">Smart In-Vehicle Connectivity Assistant</string>
+  <string name="connectivity_overview_title">Vehicle Connectivity Overview</string>
+  <string name="media_center_title">Media Center</string>
+  <string name="event_log_title">Event Log</string>
+  <string name="reconnect_flow_title">Reconnect Flow</string>
+  <string name="cycle_scenario_action_title">Cycle Scenario</string>
+  <string name="event_log_summary">%1$d events, latest: %2$s</string>
+  <string name="media_now_playing_title">Now Playing</string>
+  <string name="media_source_label">Playback Source</string>
+  <string name="media_playback_state_label">Playback State</string>
+  <string name="media_volume_label">Cabin Volume</string>
+  <string name="media_volume_value">Level %1$d</string>
+  <string name="media_toggle_action_title">Next State</string>
+  <string name="reconnect_status_label">Recovery Status</string>
+  <string name="reconnect_summary_label">Issue Summary</string>
+  <string name="reconnect_next_action_label">Next Action</string>
 
   <!-- Action Titles -->
   <string name="back_caps_action_title">BACK</string>
